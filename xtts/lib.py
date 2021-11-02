@@ -26,7 +26,7 @@ class XTTS:
         return hashed.hexdigest()
 
     def __does_cached_exist(self):
-        path = pathlib.Path(self.path + self.id_hash + '.ogg')
+        path = pathlib.Path(self.path + '/' + self.id_hash + '.ogg')
         if path.is_file():
             created = datetime.fromtimestamp(os.path.getctime(path))
             now = datetime.now()
@@ -74,9 +74,10 @@ class XTTS:
             self.success = False
             return False
 
-    def save_audio(self, path):
+    def save_audio(self):
         if self.cached_exists:
-            return self.path + self.id_hash + '.ogg'
+            print('cache exists')
+            return self.path + '/' + self.id_hash + '.ogg'
 
         if not self.audio_bytes:
             raise Exception('Please call work() before saving to audio file')
@@ -84,8 +85,8 @@ class XTTS:
             raise Exception('Request either failed or work() was not called')
         if self.errors:
             raise Exception('Request returned errors. Please rectify.')
-        path = path + '/' + self.id_hash + '.ogg'
+        path = self.path + '/' + self.id_hash + '.ogg'
         with open(path, 'wb') as f:
             audio_bytes = base64.b64decode(self.audio_bytes)
             f.write(audio_bytes)
-        return self.path + self.id_hash + '.ogg'
+        return path
